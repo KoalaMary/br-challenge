@@ -57,4 +57,4 @@ class HttpClientWithBackup:
             return res, status
         except TimeoutError:
             logger.warning('The task was cancelled due to a timeout')
-            return {"message": "Timeout Exception"}, 500
+            return {"message": "Timeout Exception"}, 504
