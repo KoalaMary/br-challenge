@@ -1,21 +1,23 @@
 import asyncio
 
 import aiohttp
-from flask import Flask
+from flask import Flask, request
 
 app = Flask(__name__)
 
 
-async def send_http_request(session: aiohttp.ClientSession):
-    async with session.get("http://127.0.0.1:5000/api/smart?timeout=1000000") as res:
+async def send_http_request(session: aiohttp.ClientSession, timeout: int):
+    async with session.get(f"http://127.0.0.1:5000/api/smart?timeout={timeout}") as res:
         return await res.text()
 
 
 @app.get("/api/smart-load-test")
-async def hello_world_load_test():
+async def http_client_load_test():
+    timeout = int(request.args.get('timeout'))
+    rps = int(request.args.get('rps'))
     result = {}
     async with aiohttp.ClientSession() as session:
-        tasks = [asyncio.create_task(send_http_request(session)) for _ in range(100)]
+        tasks = [asyncio.create_task(send_http_request(session, timeout)) for _ in range(rps)]
         done, _ = await asyncio.wait(tasks, return_when=asyncio.ALL_COMPLETED)
         result["count"] = len(done)
         for i, x in enumerate(done):

@@ -20,12 +20,11 @@ class HttpClientWithBackup:
     async def send_single_request(self, *args):
         logger.info(f"Send single request {args[0]}")
         async with self.__session.get(url=self.__url) as res:
-            res, status = await res.text(), res.status  # TODO text retuns string, need json
+            res, status = await res.text(), res.status
             logger.info(f"Single request {args[0]} result: {res, status}")
             return res, status
 
     async def send_request_with_backups(self):
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # Get rid of
         async with self.__session:
             # Sending first request
             tasks = [asyncio.create_task(self.send_single_request(1))]
@@ -36,7 +35,7 @@ class HttpClientWithBackup:
                     logger.info(f"Finished with first request: {res, status}")
                     return res, status
 
-            # Sending 2nd and 3rd requests
+            # Sending backup requests
             tasks = [asyncio.create_task(self.send_single_request(x)) for x in range(2, self.__backup_count + 2)]
             if pending:
                 tasks.append(pending.pop())
