@@ -27,7 +27,3 @@ async def get_exponea_result():
 
     res, status = await client.send_requests_with_timeout()
     return res, status, {"Content-Type": "application/json"}
-
-
-if __name__ == "__main__":
-    app.run()
